@@ -20,3 +20,7 @@ This repo is connected to Vercel. Pushing to main redeploys automatically - no m
 3. Vercel picks up the push and redeploys business-growth-leak-check.vercel.app automatically.
 
 If the lead-intake logic in google-apps-script/Code.gs changes, that update has to be pasted into the Apps Script project directly (script.google.com) and redeployed there - pushing to this repo does not touch Apps Script.
+
+_Connected to Vercel via GitHub on 2026-09-07._
+
+_Connected to Vercel via GitHub._
