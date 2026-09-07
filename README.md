@@ -24,4 +24,3 @@ vercel.json is the deployment config (clean URLs, no trailing slash).
 Edit index.html (landing page) or growth-check.html (quiz) directly, or edit a working copy and replace it. Commit and push to main. Vercel picks up the push and redeploys business-growth-leak-check.vercel.app automatically.
 
 If the lead-intake logic in google-apps-script/Code.gs changes, that update has to be pasted into the Apps Script project directly at script.google.com and redeployed there. Pushing to this repo does not touch Apps Script.
-Page_Down
