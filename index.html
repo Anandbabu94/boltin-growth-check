@@ -316,6 +316,105 @@
     .magnet{padding:34px 24px;}
     .final-cta{padding:44px 22px;}
   }
+
+  /* ---------- hero link-cta (dual-path) ---------- */
+  .link-cta{
+    display:inline-block;background:none;border:none;padding:0;margin-top:18px;
+    color:#a9b8e8;font-size:13.5px;font-weight:600;cursor:pointer;
+    text-decoration:underline;text-underline-offset:3px;font-family:inherit;
+  }
+  .link-cta:hover{color:#fff;}
+  .link-cta.on-light{color:var(--navy);opacity:.85;}
+  .link-cta.on-light:hover{opacity:1;color:var(--blue);}
+
+  /* ---------- partner strip ---------- */
+  .partner-strip{padding:34px 0;border-bottom:1px solid var(--line);}
+  .partner-strip-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px 32px;}
+  .partner-strip-label{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--body);white-space:nowrap;}
+  .partner-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;}
+  .partner-badge{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:9px 14px 9px 10px;border-radius:10px;border:1px solid var(--line);
+    font-family:'Open Sans',sans-serif;font-weight:700;font-size:13.5px;color:var(--navy);
+    background:#fff;
+  }
+  .partner-badge .mark{
+    width:22px;height:22px;flex:none;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:800;
+  }
+  .partner-badge.sf .mark{background:#00A1E0;}
+  .partner-badge.ms .mark{background:conic-gradient(from 90deg,#F25022 90deg,#7FBA00 90deg 180deg,#00A4EF 180deg 270deg,#FFB900 270deg);}
+  .partner-badge.zoho .mark{background:#E42527;}
+  .partner-badge .ptag{
+    font-size:10px;font-weight:700;color:var(--teal-deep);background:rgba(32,201,151,.12);
+    padding:2px 7px;border-radius:999px;margin-left:2px;
+  }
+
+  /* ---------- hero dashboard mockup ---------- */
+  .dash-head{display:flex;align-items:center;gap:8px;font-family:'Open Sans',sans-serif;font-weight:700;font-size:13.5px;color:var(--navy);margin-bottom:18px;}
+  .dash-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 4px rgba(32,201,151,0.18);flex:none;}
+  .dash-range{margin-left:auto;font-weight:600;font-size:12px;color:var(--body);}
+  .dash-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+  .dash-kpi{background:var(--bg-soft);border-radius:12px;padding:12px 10px;}
+  .dk-label{font-size:10.5px;color:var(--body);font-weight:600;}
+  .dk-value{font-family:'Open Sans',sans-serif;font-weight:800;font-size:18px;color:var(--navy);margin-top:2px;}
+  .dk-delta{font-size:11px;font-weight:700;margin-top:3px;}
+  .dk-delta.up{color:var(--teal-deep);}
+  .dk-delta.good{color:var(--blue);}
+  .dash-chart{height:86px;margin-bottom:14px;}
+  .dash-chart svg{width:100%;height:100%;display:block;}
+  .dash-foot{display:flex;flex-wrap:wrap;gap:16px;padding-top:14px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--body);}
+  .dash-chan{display:flex;align-items:center;gap:6px;}
+  .dash-chan b{color:var(--navy);}
+  .dash-chan .dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .dash-chan .dot.mkt{background:var(--blue);}
+  .dash-chan .dot.crm{background:var(--teal);}
+
+  /* ---------- email-gated report modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(18,32,63,0.55);backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;z-index:400;padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    background:#fff;border-radius:20px;padding:36px;max-width:420px;width:100%;
+    box-shadow:var(--shadow-lg);position:relative;
+  }
+  .modal-close{
+    position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;
+    border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px;color:var(--navy);
+  }
+  .modal-card h3{font-size:22px;margin-top:14px;}
+  .modal-card p{font-size:14.5px;margin-top:10px;}
+  .modal-card form{margin-top:20px;display:flex;flex-direction:column;gap:12px;}
+  .modal-card input{
+    padding:13px 16px;border-radius:10px;border:1.5px solid var(--line);font-size:15px;font-family:inherit;
+  }
+  .modal-card input:focus{outline:none;border-color:var(--teal);}
+  .modal-note{margin-top:14px;font-size:12px;color:var(--body);text-align:center;}
+
+  /* ---------- Growth Check slide-in overlay ---------- */
+  .quiz-overlay{position:fixed;inset:0;z-index:500;display:none;}
+  .quiz-overlay.open{display:block;}
+  .quiz-overlay-backdrop{position:absolute;inset:0;background:rgba(18,32,63,0.5);backdrop-filter:blur(2px);}
+  .quiz-panel{
+    position:absolute;top:0;right:0;height:100%;width:min(680px,100%);
+    background:#fff;box-shadow:-24px 0 60px rgba(18,32,63,0.25);
+    display:flex;flex-direction:column;
+    transform:translateX(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);
+  }
+  .quiz-overlay.open .quiz-panel{transform:translateX(0);}
+  .quiz-panel-head{
+    display:flex;align-items:center;justify-content:space-between;flex:none;
+    padding:16px 20px;border-bottom:1px solid var(--line);
+    font-family:'Open Sans',sans-serif;font-weight:700;color:var(--navy);font-size:15px;
+  }
+  .quiz-close{
+    width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;
+    cursor:pointer;font-size:14px;color:var(--navy);flex:none;
+  }
+  .quiz-panel iframe{flex:1;width:100%;border:none;}
+  @media(max-width:640px){.quiz-panel{width:100%;}}
 </style>
 </head>
 <body>
@@ -338,13 +437,17 @@
 <section class="hero">
   <div class="container hero-grid">
     <div>
-      <span class="eyebrow">● Digital Marketing + CRM, from one partner</span>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
+        <span class="eyebrow" style="margin-bottom:0;">● Digital Marketing + CRM, from one partner</span>
+        <span class="eyebrow" style="margin-bottom:0;background:rgba(236,134,0,0.16);color:#ffb35c;">🇦🇺 Built for Australian SMBs</span>
+      </div>
       <h1>Marketing that fills the pipeline. <span class="hl">CRM that never lets a lead go missing.</span></h1>
-      <p class="lead">Most agencies stop at the campaign. Most CRM consultants start after the lead. Boltin builds both — so every click, call and enquiry your marketing generates lands in a system that actually follows up.</p>
+      <p class="lead">Most agencies stop at the campaign. Most CRM consultants start after the lead. Boltin builds both for growing Australian businesses — so every click, call and enquiry your marketing generates lands in a system that actually follows up.</p>
       <div class="hero-actions">
         <a href="#contact" class="btn btn-primary">Book a Free Discovery Call</a>
         <a href="#growth-check" class="btn btn-outline-navy">Take the 2-Min Growth Check →</a>
       </div>
+      <button type="button" class="link-cta" onclick="openReportModal()">No time for a call? Get your free Growth Leak Report by email →</button>
       <div class="hero-trust">
         <div class="trust-stat"><div class="num">98%</div><div class="label">Client retention rate</div></div>
         <div class="trust-stat"><div class="num">80+</div><div class="label">Implementations delivered</div></div>
@@ -353,19 +456,55 @@
       </div>
     </div>
     <div class="hero-card">
-      <div class="hero-card-badge">One partner, one plan</div>
-      <div class="flow-row">
-        <div class="flow-icon mkt">📣</div>
-        <div class="flow-text"><div class="t">Digital Marketing</div><div class="d">Search, social &amp; paid campaigns built for your industry</div></div>
+      <div class="hero-card-badge">Live pipeline preview</div>
+      <div class="dash-head">
+        <span class="dash-dot"></span> Boltin Dashboard
+        <span class="dash-range">Last 30 days</span>
       </div>
-      <div class="flow-row">
-        <div class="flow-icon crm">🗂️</div>
-        <div class="flow-text"><div class="t">CRM Implementation</div><div class="d">Salesforce, Microsoft or Zoho — set up to capture every lead automatically</div></div>
+      <div class="dash-kpis">
+        <div class="dash-kpi">
+          <div class="dk-label">Pipeline Value</div>
+          <div class="dk-value">$184K</div>
+          <div class="dk-delta up">▲ 22%</div>
+        </div>
+        <div class="dash-kpi">
+          <div class="dk-label">New Leads</div>
+          <div class="dk-value">312</div>
+          <div class="dk-delta up">▲ 38%</div>
+        </div>
+        <div class="dash-kpi">
+          <div class="dk-label">Response Time</div>
+          <div class="dk-value">4 min</div>
+          <div class="dk-delta good">▼ from 24h</div>
+        </div>
       </div>
-      <div class="flow-row">
-        <div class="flow-icon win">📈</div>
-        <div class="flow-text"><div class="t">Measurable Pipeline</div><div class="d">One dashboard showing cost, conversion and revenue by channel</div></div>
+      <div class="dash-chart">
+        <svg viewBox="0 0 300 90" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="dashFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#20c997" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#20c997" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <polygon points="0,70 30,64 60,68 90,50 120,55 150,38 180,42 210,26 240,30 270,14 300,18 300,90 0,90" fill="url(#dashFill)"/>
+          <polyline points="0,70 30,64 60,68 90,50 120,55 150,38 180,42 210,26 240,30 270,14 300,18" fill="none" stroke="#20c997" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
+      <div class="dash-foot">
+        <div class="dash-chan"><span class="dot mkt"></span>Marketing sourced <b>68%</b></div>
+        <div class="dash-chan"><span class="dot crm"></span>CRM-assisted close <b>32%</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="partner-strip reveal">
+  <div class="container partner-strip-inner">
+    <span class="partner-strip-label">Certified Partner</span>
+    <div class="partner-badges">
+      <span class="partner-badge sf"><span class="mark">☁</span>Salesforce<span class="ptag">Certified</span></span>
+      <span class="partner-badge ms"><span class="mark">⊞</span>Microsoft<span class="ptag">Certified</span></span>
+      <span class="partner-badge zoho"><span class="mark">Z</span>Zoho<span class="ptag">Certified</span></span>
     </div>
   </div>
 </section>
@@ -457,20 +596,20 @@
       <div class="case retail reveal">
         <span class="badge">Retail</span>
         <h4>Retail Startup</h4>
-        <p>A digital marketing overhaul boosted customer inquiries and online visibility — then a lightweight CRM made sure every one of those inquiries got a same-day response.</p>
-        <div class="result">↑ Inquiries &amp; online visibility</div>
+        <p>A digital marketing overhaul lifted qualified inquiries 3.2x in 90 days — then a lightweight CRM cut first-response time from next-day to under 15 minutes, so nothing sat cold.</p>
+        <div class="result">↓ Response time: 24 hrs → 15 min</div>
       </div>
       <div class="case edtech reveal">
         <span class="badge">EdTech</span>
         <h4>EdTech Platform</h4>
-        <p>A CRM-driven rollout improved team engagement and student management, giving the platform a single source of truth across admissions and support.</p>
-        <div class="result">↑ Engagement &amp; retention</div>
+        <p>A CRM-driven rollout gave admissions and support a single source of truth — team engagement rose 54% and average onboarding time dropped from 12 days to 4.</p>
+        <div class="result">↑ 54% team engagement in 60 days</div>
       </div>
       <div class="case staffing reveal">
         <span class="badge">Staffing</span>
         <h4>Staffing Firm</h4>
-        <p>Process automation reclaimed hours of manual admin every week, freeing the team to focus on candidates and clients instead of data entry.</p>
-        <div class="result">↑ Hours reclaimed weekly</div>
+        <p>Process automation reclaimed 11 hours of manual admin per recruiter every week — freeing the team to focus on candidates, which lifted placements 28% the following quarter.</p>
+        <div class="result">↓ 11 hrs/week admin, ↑ 28% placements</div>
       </div>
     </div>
   </div>
@@ -525,7 +664,7 @@
         <div class="mp-row"><span>Lead follow-up &amp; CRM health check</span><b>Included</b></div>
         <div class="mp-row"><span>Personalised recommendations</span><b>Included</b></div>
         <div class="mp-row"><span>Obligation</span><b>None</b></div>
-        <a href="/growth-check" class="btn btn-primary">Take the Growth Check →</a>
+        <a href="/growth-check" class="btn btn-primary" onclick="return openQuiz(event)">Take the Growth Check →</a>
       </div>
     </div>
   </div>
@@ -570,8 +709,9 @@
       <p>Book a free, no-obligation discovery call — or take the 2-minute Growth Check first if you'd rather start there.</p>
       <div class="final-actions">
         <a href="#" class="btn btn-primary">Book a Free Discovery Call</a>
-        <a href="#growth-check" class="btn btn-ghost">Take the Growth Check</a>
+        <a href="/growth-check" class="btn btn-ghost" onclick="return openQuiz(event)">Take the Growth Check</a>
       </div>
+      <button type="button" class="link-cta on-light" onclick="openReportModal()">Or just get your free Growth Leak Report by email →</button>
     </div>
   </div>
 </section>
@@ -617,6 +757,31 @@
   </div>
 </footer>
 
+<div class="modal-overlay" id="reportModalOverlay" onclick="if(event.target===this) closeReportModal()">
+  <div class="modal-card">
+    <button type="button" class="modal-close" onclick="closeReportModal()" aria-label="Close">✕</button>
+    <span class="eyebrow">Free — No Call Required</span>
+    <h3>Get your free Growth Leak Report</h3>
+    <p>Pop in your email and we'll take you straight into the 2-minute assessment — no phone call, no obligation.</p>
+    <form id="reportForm" onsubmit="return submitReportEmail(event)">
+      <input type="email" id="reportEmail" placeholder="you@company.com" required autocomplete="email">
+      <button type="submit" class="btn btn-primary">Get My Free Report →</button>
+    </form>
+    <div class="modal-note">We'll only use this to send your result. No spam, ever.</div>
+  </div>
+</div>
+
+<div class="quiz-overlay" id="quizOverlay" aria-hidden="true">
+  <div class="quiz-overlay-backdrop" onclick="closeQuiz()"></div>
+  <div class="quiz-panel">
+    <div class="quiz-panel-head">
+      <span>Business Growth Leak Check</span>
+      <button type="button" class="quiz-close" onclick="closeQuiz()" aria-label="Close">✕</button>
+    </div>
+    <iframe id="quizFrame" title="Boltin Growth Check"></iframe>
+  </div>
+</div>
+
 <script>
   // FAQ accordion
   document.querySelectorAll('.faq-item').forEach(item=>{
@@ -632,6 +797,84 @@
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
   },{threshold:0.12});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // ---------- Growth Check slide-in overlay ----------
+  // Loads the existing /growth-check quiz into an iframe and slides it in over
+  // the landing page, so visitors get the full quiz without ever navigating away.
+  // href="/growth-check" is kept on every trigger as a real fallback link.
+  function openQuiz(e, prefillEmail){
+    if(e && e.preventDefault) e.preventDefault();
+    const overlay = document.getElementById('quizOverlay');
+    const frame = document.getElementById('quizFrame');
+    if(!frame.src){
+      frame.src = '/growth-check';
+    }
+    if(prefillEmail){
+      const fillEmail = function(){
+        try{
+          const doc = frame.contentDocument;
+          const emailInput = doc && doc.getElementById('f-email');
+          if(emailInput) emailInput.value = prefillEmail;
+        }catch(err){ /* cross-origin or not-ready — ignore, quiz still opens fine */ }
+        frame.removeEventListener('load', fillEmail);
+      };
+      frame.addEventListener('load', fillEmail);
+    }
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    return false;
+  }
+  function closeQuiz(){
+    const overlay = document.getElementById('quizOverlay');
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  }
+
+  // ---------- Dual-path CTA: email-gated Free Growth Leak Report ----------
+  // Lower-friction alternative to booking a call — captures just an email as a
+  // lead via the same webhook the quiz uses, then drops the visitor straight
+  // into the Growth Check for their personalised result.
+  const REPORT_LEAD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx5UNzZ__CRNt7HoIxkkiRCDJ2R5-5m10yygudZYjUSyQ4OR3Ousq_RDbu48cfK4rpx/exec';
+
+  function openReportModal(){
+    document.getElementById('reportModalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(()=>document.getElementById('reportEmail').focus(), 50);
+  }
+  function closeReportModal(){
+    document.getElementById('reportModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function submitReportEmail(e){
+    e.preventDefault();
+    const email = document.getElementById('reportEmail').value.trim();
+    if(!email) return false;
+
+    const lead = {
+      name: '', email: email, phone: '', company: '', website: '',
+      consent: true, submittedAt: new Date().toISOString(),
+      answers: [], scores: {}, advanced: {}, source: 'landing_quick_report'
+    };
+    if(REPORT_LEAD_WEBHOOK_URL && !REPORT_LEAD_WEBHOOK_URL.includes('REPLACE_WITH')){
+      fetch(REPORT_LEAD_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(lead)
+      }).catch(function(err){ console.warn('Report-request lead delivery failed:', err); });
+    }
+
+    closeReportModal();
+    document.getElementById('reportForm').reset();
+    openQuiz(null, email);
+    return false;
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){ closeQuiz(); closeReportModal(); }
+  });
 </script>
 
 <script defer src="/_vercel/insights/script.js"></script>
