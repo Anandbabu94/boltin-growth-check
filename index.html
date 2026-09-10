@@ -876,6 +876,36 @@
   // Apps Script webhook the quiz uses.
   const CALL_LEAD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx5UNzZ__CRNt7HoIxkkiRCDJ2R5-5m10yygudZYjUSyQ4OR3Ousq_RDbu48cfK4rpx/exec';
 
+  // ---------- Visitor location (best-effort, IP-based) ----------
+  // Same approach as the quiz (growth-check.html): a key-less IP-geolocation
+  // lookup fired once on page load, no permission prompt shown. Never blocks
+  // the Book a Call form — if it hasn't resolved yet, fields stay blank.
+  const visitorLocation = { city: null, region: null, country: null, countryCode: null };
+  (function fetchVisitorLocation(){
+    function withTimeout(promise, ms){
+      return Promise.race([
+        promise,
+        new Promise(function(_, reject){ setTimeout(function(){ reject(new Error('location lookup timed out')); }, ms); })
+      ]);
+    }
+    function applyLocation(data){
+      visitorLocation.city = (data && data.city) || null;
+      visitorLocation.region = (data && data.region) || null;
+      visitorLocation.country = (data && data.country) || null;
+      visitorLocation.countryCode = (data && data.country_code) || null;
+    }
+    withTimeout(fetch('https://ipwho.is/').then(function(r){ return r.json(); }), 4000)
+      .then(function(data){
+        if(!data || data.success === false) throw new Error('primary location lookup failed');
+        applyLocation(data);
+      })
+      .catch(function(){
+        return withTimeout(fetch('https://get.geojs.io/v1/ip/geo.json').then(function(r){ return r.json(); }), 4000)
+          .then(applyLocation)
+          .catch(function(err){ console.warn('Visitor location lookup failed (non-blocking):', err); });
+      });
+  })();
+
   function openBookCallModal(e){
     if(e && e.preventDefault) e.preventDefault();
     document.getElementById('bookCallFormWrap').style.display = '';
@@ -922,7 +952,8 @@
       name: name, email: email, phone: phone, company: '', website: website,
       consent: true, submittedAt: new Date().toISOString(),
       answers: [], scores: {}, advanced: {},
-      service: service, source: 'landing_discovery_call'
+      service: service, source: 'landing_discovery_call',
+      location: visitorLocation
     };
     if(CALL_LEAD_WEBHOOK_URL && !CALL_LEAD_WEBHOOK_URL.includes('REPLACE_WITH')){
       fetch(CALL_LEAD_WEBHOOK_URL, {

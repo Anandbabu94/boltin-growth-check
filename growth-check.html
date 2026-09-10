@@ -528,6 +528,43 @@ const CONFIG = {
 };
 
 /* ---------------------------------------------------------
+   VISITOR LOCATION (best-effort, IP-based)
+   Looked up once on load via a free, key-less IP-geolocation
+   API — no permission prompt, nothing shown to the visitor.
+   Lets each Sheet row show roughly where the lead is from.
+   Never blocks the quiz or the lead submit: if the lookup
+   hasn't resolved by the time they submit, the fields are
+   just left blank rather than holding anything up.
+--------------------------------------------------------- */
+const visitorLocation = { city: null, region: null, country: null, countryCode: null };
+(function fetchVisitorLocation(){
+  function withTimeout(promise, ms){
+    return Promise.race([
+      promise,
+      new Promise(function(_, reject){ setTimeout(function(){ reject(new Error('location lookup timed out')); }, ms); })
+    ]);
+  }
+  function applyLocation(data){
+    visitorLocation.city = (data && data.city) || null;
+    visitorLocation.region = (data && data.region) || null;
+    visitorLocation.country = (data && data.country) || null;
+    visitorLocation.countryCode = (data && data.country_code) || null;
+  }
+  withTimeout(fetch('https://ipwho.is/').then(function(r){ return r.json(); }), 4000)
+    .then(function(data){
+      if(!data || data.success === false) throw new Error('primary location lookup failed');
+      applyLocation(data);
+    })
+    .catch(function(){
+      // Primary provider failed or timed out — try a second free provider
+      // before giving up (fields stay null and are simply omitted).
+      return withTimeout(fetch('https://get.geojs.io/v1/ip/geo.json').then(function(r){ return r.json(); }), 4000)
+        .then(applyLocation)
+        .catch(function(err){ console.warn('Visitor location lookup failed (non-blocking):', err); });
+    });
+})();
+
+/* ---------------------------------------------------------
    QUESTION BANK
    Each option carries a score 0–3. dim: "mkt" or "crm"
 --------------------------------------------------------- */
@@ -1306,7 +1343,8 @@ function submitLead(e){
     submittedAt: new Date().toISOString(),
     answers: state.answers,
     scores: computeScores(),
-    advanced: state.advanced
+    advanced: state.advanced,
+    location: visitorLocation
   };
 
   // Best-effort delivery to the Google Sheet + email notification (see
