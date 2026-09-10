@@ -211,6 +211,32 @@
   .adv-actions .btn{flex:1;min-width:160px;}
   .adv-skip-note{font-size:12px;color:var(--body);margin-top:12px;text-align:center;}
 
+  /* platform multi-select chips */
+  .field-note{font-weight:600;color:var(--body);text-transform:none;letter-spacing:0;}
+  .chip-group{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:10px 16px;border:1.5px solid var(--line);border-radius:999px;
+    background:#fff;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .chip:hover{border-color:var(--blue);background:var(--blue-tint);}
+  .chip.selected{border-color:var(--teal);background:var(--teal-tint);color:var(--navy);}
+  .chip .chk{
+    flex:none;width:16px;height:16px;border-radius:5px;border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:10.5px;background:#fff;color:transparent;
+  }
+  .chip.selected .chk{background:var(--teal);border-color:var(--teal);color:#fff;}
+
+  /* channel recap on results */
+  .channel-recap{margin-top:20px;}
+  .channel-recap .crlabel{font-size:12.5px;font-weight:700;color:var(--navy);display:block;margin-bottom:8px;}
+  .chip-static{
+    display:inline-flex;align-items:center;padding:7px 14px;border-radius:999px;
+    background:var(--bg-soft);border:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--navy);
+    cursor:default;
+  }
+
   /* ROI snapshot */
   .roi-card{border-radius:16px;padding:22px 24px;margin:26px 0;background:var(--blue-tint);border:1px solid rgba(2,100,189,0.14);}
   .roi-card h4{font-size:15.5px;}
@@ -318,6 +344,14 @@
         </div>
       </div>
 
+      <div class="form-grid" style="margin-top:16px;">
+        <div class="field">
+          <label>Which platform(s) are you currently spending that budget on? <span class="field-note">(optional — select all that apply)</span></label>
+          <div class="chip-group" id="platformGroup" role="group" aria-label="Marketing platforms you currently spend on"></div>
+          <div class="field-hint">This tailors the tactics in your results to where your budget is actually going.</div>
+        </div>
+      </div>
+
       <div class="adv-actions">
         <button type="button" class="btn btn-ghost" onclick="skipAdvanced()">Skip — just show my score</button>
         <button type="button" class="btn btn-primary" onclick="continueAdvanced()">Continue →</button>
@@ -382,6 +416,10 @@
         <div class="field-error" id="err-general" style="text-align:center;margin-top:6px;"></div>
         <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Show My Results →</button>
       </form>
+      <div class="nav-row" style="margin-top:6px;">
+        <button class="back-link" type="button" onclick="goTo(9)">← Back</button>
+        <span></span>
+      </div>
     </div>
 
     <!-- STEP 11: RESULTS -->
@@ -423,6 +461,12 @@
           <h4>Your biggest opportunity</h4>
           <p id="opportunityText"></p>
         </div>
+      </div>
+
+      <!-- Channel recap — only shown if platform(s) were selected in the advanced step -->
+      <div class="channel-recap" id="channelRecap" style="display:none;">
+        <span class="crlabel">Your current channel mix</span>
+        <div class="chip-group" id="channelRecapChips"></div>
       </div>
 
       <!-- ROI Snapshot — only shown if budget + industry were provided -->
@@ -570,7 +614,7 @@ const QUESTIONS = [
   }
 ];
 
-const state = { current:0, answers: new Array(QUESTIONS.length).fill(null), advanced: { budget:null, currency:'AUD', industry:null, leads:null } };
+const state = { current:0, answers: new Array(QUESTIONS.length).fill(null), advanced: { budget:null, currency:'AUD', industry:null, leads:null, platforms:[] } };
 
 /* ---------------------------------------------------------
    INDUSTRY BENCHMARKS
@@ -596,6 +640,28 @@ const INDUSTRIES = [
 /* Approx. FX — 1 unit of currency in AUD (early 2026, illustrative only) */
 const FX_RATES = { AUD:1, USD:1.389, GBP:1.877, EUR:1.612, NZD:0.817, CAD:1.004, SGD:1.096 };
 const CURRENCY_SYMBOLS = { AUD:'A$', USD:'US$', GBP:'£', EUR:'€', NZD:'NZ$', CAD:'C$', SGD:'S$' };
+
+/* ---------------------------------------------------------
+   PLATFORM CATALOG
+   Multi-select — where the person's marketing budget is
+   currently going. Optional, and independent of the
+   budget/industry/leads ROI fields above. "none" is exclusive
+   (picking it clears every other chip, and vice versa) since
+   "no channel" and "some channel" can't both be true.
+--------------------------------------------------------- */
+const PLATFORMS = [
+  { key:'google_search', label:'🔍 Google Ads / Search PPC' },
+  { key:'meta',           label:'📸 Meta (Facebook & Instagram)' },
+  { key:'linkedin',       label:'💼 LinkedIn Ads' },
+  { key:'tiktok',         label:'🎵 TikTok / short-form video' },
+  { key:'seo',            label:'🌱 SEO / organic search' },
+  { key:'email',          label:'✉️ Email marketing' },
+  { key:'referral',       label:'🤝 Referral / word of mouth' },
+  { key:'other',          label:'➕ Other' },
+  { key:'none',           label:'🚫 Not currently spending anywhere' }
+];
+const PLATFORM_LABELS = Object.fromEntries(PLATFORMS.map(p => [p.key, p.label.replace(/^\S+\s/, '')]));
+const PAID_PLATFORM_KEYS = ['google_search', 'meta', 'linkedin', 'tiktok'];
 
 /* Build question steps into the DOM */
 const mount = document.getElementById('question-mount');
@@ -633,6 +699,48 @@ INDUSTRIES.forEach(ind=>{
   industrySelect.appendChild(opt);
 });
 
+/* Populate platform chips */
+const platformGroup = document.getElementById('platformGroup');
+PLATFORMS.forEach(p=>{
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'chip';
+  btn.dataset.key = p.key;
+  btn.setAttribute('aria-pressed', 'false');
+  btn.innerHTML = `<span class="chk">✓</span><span>${p.label}</span>`;
+  btn.onclick = () => togglePlatform(p.key, btn);
+  platformGroup.appendChild(btn);
+});
+
+function togglePlatform(key, btnEl){
+  if(key === 'none'){
+    // exclusive: picking "none" clears every other chip
+    [...platformGroup.children].forEach(c=>{ c.classList.remove('selected'); c.setAttribute('aria-pressed','false'); });
+    btnEl.classList.add('selected');
+    btnEl.setAttribute('aria-pressed','true');
+    return;
+  }
+  // picking any real channel clears "none" if it was active
+  const noneBtn = [...platformGroup.children].find(c=>c.dataset.key==='none');
+  if(noneBtn){ noneBtn.classList.remove('selected'); noneBtn.setAttribute('aria-pressed','false'); }
+  const nowSelected = !btnEl.classList.contains('selected');
+  btnEl.classList.toggle('selected', nowSelected);
+  btnEl.setAttribute('aria-pressed', String(nowSelected));
+}
+
+function getSelectedPlatforms(){
+  return [...platformGroup.querySelectorAll('.chip.selected')].map(c=>c.dataset.key);
+}
+
+function setSelectedPlatforms(keys){
+  const set = new Set(keys || []);
+  [...platformGroup.children].forEach(c=>{
+    const on = set.has(c.dataset.key);
+    c.classList.toggle('selected', on);
+    c.setAttribute('aria-pressed', String(on));
+  });
+}
+
 function onIndustryChange(){
   const key = industrySelect.value;
   const desc = document.getElementById('industryDesc');
@@ -644,7 +752,11 @@ function onIndustryChange(){
 }
 
 function skipAdvanced(){
-  state.advanced = { budget:null, currency:'AUD', industry:null, leads:null };
+  // Skipping only clears the ROI-benchmark fields (budget/industry/leads) — a
+  // platform selection made before hitting Skip is still meaningful for
+  // tailoring the tactics list, so it's preserved rather than discarded.
+  state.advanced = { budget:null, currency:'AUD', industry:null, leads:null, platforms: getSelectedPlatforms() };
+  updateTeaser();
   goTo(10);
 }
 
@@ -656,44 +768,59 @@ function continueAdvanced(){
   const budgetRaw = budgetEl.value.trim();
   const industryKey = industryEl.value;
   const leadsRaw = leadsEl.value.trim();
+  const platforms = getSelectedPlatforms();
 
   clearFieldError(budgetEl, document.getElementById('err-budget'));
   clearFieldError(industryEl, document.getElementById('err-industry'));
   clearFieldError(leadsEl, document.getElementById('err-leads'));
 
-  // Nothing entered at all — treat Continue the same as Skip
+  // Nothing entered in the ROI-benchmark fields — treat Continue the same as
+  // Skip for those, but still keep any platform chips that were selected.
   if(!budgetRaw && !industryKey && !leadsRaw){
-    state.advanced = { budget:null, currency:'AUD', industry:null, leads:null };
+    state.advanced = { budget:null, currency:'AUD', industry:null, leads:null, platforms };
+    updateTeaser();
     goTo(10);
     return;
   }
 
+  // Once ANY of budget/industry/leads has been touched, all three are
+  // required together — the ROI snapshot on the results page only renders
+  // when all three are present (see hasAllInputs in renderResults), so
+  // silently accepting a partial fill here would just produce a dead end
+  // with no explanation. Every branch below fires on its own condition
+  // (not gated on budgetRaw alone), so a lone industry pick or a lone
+  // leads count is now caught too, not just a lone budget entry.
   let firstInvalid = null;
   const budgetNum = parseFloat(budgetRaw);
-  if(budgetRaw && (isNaN(budgetNum) || budgetNum <= 0)){
-    setFieldError(budgetEl, document.getElementById('err-budget'), 'Enter a valid budget amount, or leave it blank.');
+  if(!budgetRaw){
+    setFieldError(budgetEl, document.getElementById('err-budget'), 'Add a budget too — we need all three to benchmark this accurately.');
+    firstInvalid = firstInvalid || budgetEl;
+  } else if(isNaN(budgetNum) || budgetNum <= 0){
+    setFieldError(budgetEl, document.getElementById('err-budget'), 'Enter a valid budget amount, or clear all three fields to skip this section.');
     firstInvalid = firstInvalid || budgetEl;
   }
-  if(budgetRaw && !industryKey){
+  if(!industryKey){
     setFieldError(industryEl, document.getElementById('err-industry'), 'Pick an industry so we can benchmark this accurately.');
     firstInvalid = firstInvalid || industryEl;
   }
   const leadsNum = parseFloat(leadsRaw);
-  if(budgetRaw && !leadsRaw){
+  if(!leadsRaw){
     setFieldError(leadsEl, document.getElementById('err-leads'), 'Enter how many leads it generated — 0 is a valid answer.');
     firstInvalid = firstInvalid || leadsEl;
-  } else if(leadsRaw && (isNaN(leadsNum) || leadsNum < 0)){
+  } else if(isNaN(leadsNum) || leadsNum < 0){
     setFieldError(leadsEl, document.getElementById('err-leads'), 'Enter a valid number of leads (0 or more).');
     firstInvalid = firstInvalid || leadsEl;
   }
   if(firstInvalid){ firstInvalid.focus(); return; }
 
   state.advanced = {
-    budget: budgetRaw ? budgetNum : null,
+    budget: budgetNum,
     currency: currencyEl.value,
-    industry: industryKey || null,
-    leads: leadsRaw ? leadsNum : null
+    industry: industryKey,
+    leads: leadsNum,
+    platforms
   };
+  updateTeaser();
   goTo(10);
 }
 
@@ -730,6 +857,16 @@ function computeScores(){
   const crmPct = Math.round((crmTotal/crmMax)*100);
   const overall = Math.round(((mktTotal+crmTotal)/(mktMax+crmMax))*100);
   return { mktPct, crmPct, overall };
+}
+
+// The lead-capture step shows a blurred "teaser" score to create curiosity
+// before the person hands over their details. It used to be a hard-coded
+// "72" regardless of how the person actually answered — every visitor saw
+// the same fake number. This computes and shows their real (still-blurred)
+// score instead, called right before step 10 is shown.
+function updateTeaser(){
+  const { overall } = computeScores();
+  document.getElementById('teaserNum').textContent = overall;
 }
 
 function bandFor(score){
@@ -771,6 +908,53 @@ const TACTICS = {
     "Run marketing and CRM improvements in the same quarter — fixing one without the other caps the return on both."
   ]
 };
+
+/* ---------------------------------------------------------
+   CHANNEL-AWARE MARKETING TACTICS
+   When the person has selected which platform(s) they spend
+   on, swap the generic marketing tactics for ones that
+   actually reference their mix — what's missing, whether
+   they're concentrated in one paid channel, etc. Returns null
+   when no platform data exists so the caller can fall back to
+   the generic TACTICS.mkt list.
+--------------------------------------------------------- */
+function channelMktTactics(platforms){
+  if(!platforms || platforms.length === 0) return null;
+
+  if(platforms.includes('none')){
+    return [
+      "You're not currently spending anywhere — start with one focused channel (Google Search or Meta) aimed at your highest-intent buyers rather than spreading thin across several at once.",
+      "Fix your Google Business Profile and core service pages first — it's free, and it compounds before you spend a dollar on ads.",
+      "Publish one proof asset a month (case study, review, before/after) so the traffic you do get actually converts."
+    ];
+  }
+
+  const set = new Set(platforms);
+  const paidActive = PAID_PLATFORM_KEYS.filter(k => set.has(k));
+  const list = [];
+
+  if(!set.has('seo')){
+    list.push("SEO / organic isn't in your mix yet — fixing your Google Business Profile and core service pages captures free, high-intent traffic that your paid spend is currently missing entirely.");
+  } else {
+    list.push("Your organic search foundation is already in place — keep it compounding with one proof asset (case study, review, before/after) a month.");
+  }
+
+  if(paidActive.length === 0){
+    list.push("You have no paid channel running right now — a focused Google Search or LinkedIn campaign aimed at your highest-intent buyers is usually the fastest lever available to you.");
+  } else if(paidActive.length === 1){
+    list.push(`You're only running paid on ${PLATFORM_LABELS[paidActive[0]]} — fine as a focus, but it's a concentration risk. Once it's clearly profitable, test a second channel aimed at a different stage of the buying journey before scaling further.`);
+  } else {
+    list.push(`You're spending across ${paidActive.length} paid channels (${paidActive.map(k=>PLATFORM_LABELS[k]).join(', ')}) — make sure you can see cost-per-lead by channel (see the tracking question above) so budget keeps flowing to what's actually converting.`);
+  }
+
+  if(set.has('referral') && set.size === 1){
+    list.push("Referral is doing all the work right now — high quality, but it doesn't scale predictably and dries up if a few key relationships change. Layer in one owned or paid channel alongside it.");
+  } else if(set.has('email')){
+    list.push("You're using email — make sure it's warming up inbound leads automatically (a welcome/nurture sequence), not just going out as an occasional one-off newsletter.");
+  }
+
+  return list.slice(0, 3);
+}
 
 /* Who should execute the fix — score band + budget aware */
 function resourcingFor(overall, budgetAUD){
@@ -874,10 +1058,29 @@ function renderResults(){
   oppBox.style.background = band.tint;
   document.getElementById('opportunityText').innerHTML = `<b>${rec.title}.</b> ${rec.text}`;
 
-  // tactics + resourcing (always shown)
+  // tactics + resourcing (always shown). When marketing is the flagged
+  // opportunity AND the person told us which platform(s) they spend on,
+  // swap in tactics that reference their actual channel mix instead of
+  // the generic list.
   const tacticsKey = gap < 12 ? 'balanced' : (mktPct < crmPct ? 'mkt' : 'crm');
   const tacticsList = document.getElementById('tacticsList');
-  tacticsList.innerHTML = TACTICS[tacticsKey].map(t => `<li><span class="tk">✓</span><span>${t}</span></li>`).join('');
+  const channelTactics = tacticsKey === 'mkt' ? channelMktTactics(state.advanced.platforms) : null;
+  const tactics = channelTactics || TACTICS[tacticsKey];
+  tacticsList.innerHTML = tactics.map(t => `<li><span class="tk">✓</span><span>${t}</span></li>`).join('');
+
+  // channel recap — confirms back to the person what we used to tailor the
+  // tactics above, only shown if they actually selected something
+  const channelRecap = document.getElementById('channelRecap');
+  const channelRecapChips = document.getElementById('channelRecapChips');
+  const platforms = state.advanced.platforms || [];
+  if(platforms.length){
+    channelRecap.style.display = '';
+    const realChannels = platforms.filter(k => k !== 'none');
+    channelRecapChips.innerHTML = (realChannels.length ? realChannels : ['none'])
+      .map(k => `<span class="chip-static">${PLATFORM_LABELS[k] || k}</span>`).join('');
+  } else {
+    channelRecap.style.display = 'none';
+  }
 
   const budgetAUD = state.advanced.budget ? state.advanced.budget * FX_RATES[state.advanced.currency] : null;
   document.getElementById('resourcingText').textContent = resourcingFor(overall, budgetAUD);
@@ -1130,7 +1333,7 @@ function submitLead(e){
 function restart(){
   state.current = 0;
   state.answers = new Array(QUESTIONS.length).fill(null);
-  state.advanced = { budget:null, currency:'AUD', industry:null, leads:null };
+  state.advanced = { budget:null, currency:'AUD', industry:null, leads:null, platforms:[] };
   document.querySelectorAll('.option.selected').forEach(o=>o.classList.remove('selected'));
   document.getElementById('leadForm').reset();
   document.getElementById('f-budget').value = '';
@@ -1138,6 +1341,8 @@ function restart(){
   document.getElementById('f-industry').value = '';
   document.getElementById('f-leads').value = '';
   document.getElementById('industryDesc').classList.remove('show');
+  setSelectedPlatforms([]);
+  document.getElementById('channelRecap').style.display = 'none';
   clearFieldError(document.getElementById('f-budget'), document.getElementById('err-budget'));
   clearFieldError(document.getElementById('f-industry'), document.getElementById('err-industry'));
   clearFieldError(document.getElementById('f-leads'), document.getElementById('err-leads'));
